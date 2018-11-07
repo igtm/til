@@ -1,0 +1,115 @@
+1 5% t
+2 3% t
+3 3% t
+4 7% crashする touch /workdir/calm.txt initcontainer
+5 4% t
+6 2% t
+7 4% t
+●8 4% NodePort pod
+9 3% t
+10 3% t
+11 3% t
+12 7% t
+13 4% t
+14 7% t
+15 2% t
+16 2% t
+●17 7% pod のdnsだけできない
+18 7% t
+19 4% t
+●20 4% NotReadyのnode調査
+●21 4%
+●22 8% ssh
+●23 4% 障害状況特定
+24 3% t
+
+man lf_exam
+
+kubectl config use-context k8s
+hk8s
+bk8s
+wk8s
+wk8s
+ek8s
+ik8s
+
+ssh k8s-node-0
+sudo -i
+
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: my-application
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-test
+  template:
+    metadata:
+      labels:
+        app: nginx-test
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox1
+  labels:
+    name: busybox
+spec:
+  hostname: busybox-1
+  containers:
+  - image: busybox:1.28
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-test
+spec:
+  ports:
+  - name: nginx-test
+    port: 80
+    targetPort: 80
+
+
+ETCDCTL_API=3 etcdctl --endpoints https://127.0.0.1:2379 snapshot save /var/lib/backup/etcd-snapshot.db --cert=/opt/KUCM00302/etcd-client.crt --key=/opt/KUCM00302/etcd-client.key --cacert=/opt/KUCM00302/ca.crt
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: app-data
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /srv/app-data
